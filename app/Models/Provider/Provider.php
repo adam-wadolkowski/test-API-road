@@ -19,13 +19,13 @@ class Provider implements ProviderInterface {
     public function __construct(Array $additionalsUrlOptions = [])
     {
         if(isArrayNotEmpty($additionalsUrlOptions)){
-            //var_dump($this->getConnectionOptions());
-            //var_dump($additionalsUrlOptions);
             $URL = $this->getConnectionOption(CURLOPT_URL);
-
+            //to do - loading API key from file
+            /*
             if(empty($this->apiKey['key']))
                 echo 'lad';
             else
+            */
                 $additionalsUrlOptions = array_merge($this->apiKey,$additionalsUrlOptions);
 
             $URL .= createURN($additionalsUrlOptions);
