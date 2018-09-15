@@ -9,29 +9,42 @@ class Provider implements ProviderInterface {
 
     private $httpSuccessCodes = [200,202];
     private $apiKey = ['key' => 'EvsnNn2Q5CvsxEvDNe5FDA79V9NRayhU'];
+    //private $apiKey = ['key' => ''];
     private $connectionOptions = [
         CURLOPT_URL => 'http://www.mapquestapi.com/directions/v2/route?',
-        CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_HEADER => false,
         CURLOPT_RETURNTRANSFER => true
     ];
 
-    public function __construct(Array $additionalsUrlOptions = [])
-    {
-        if(isArrayNotEmpty($additionalsUrlOptions)){
-            $URL = $this->getConnectionOption(CURLOPT_URL);
-            //to do - loading API key from file
-            /*
-            if(empty($this->apiKey['key']))
-                echo 'lad';
-            else
-            */
-                $additionalsUrlOptions = array_merge($this->apiKey,$additionalsUrlOptions);
+    public function __construct(Array $additionalsURLOptions = [])
+    {   
+        
+        if($this->isSetApiKey()){
+            $URL = $this->updateURLConnection($this->apiKey);
+            $this->setConnectionOptions([CURLOPT_URL => $URL]);
+        }
+        else
+            echo 'TO DO - get api key from config file .env';
+        
+        if(isArrayNotEmpty($additionalsURLOptions)) {
 
-            $URL .= createURN($additionalsUrlOptions);
+            $URL = $this->updateURLConnection($additionalsURLOptions);
 
             $this->setConnectionOptions([CURLOPT_URL => $URL]);
         }
+    }
+
+    private function isSetApiKey(): bool
+    {
+        return empty($this->apiKey['key']) ? false : true; 
+    }
+
+    private function updateURLConnection(Array $data): String 
+    {
+        $URL = $this->getConnectionOption(CURLOPT_URL);
+        $URL .= createURN($data);
+
+        return $URL;
     }
 
     private function getHttpSuccessCodes(): Array
@@ -73,7 +86,6 @@ class Provider implements ProviderInterface {
 
     private function requestResponseCurl(): Array
     {
-        //$jsonResponseData = file_get_contents($url);
         try
         {
             $curl = curl_init();
@@ -87,12 +99,19 @@ class Provider implements ProviderInterface {
             }
 
             $responseCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            $responseData = json_decode($curlResultRequest,TRUE);
             
             if ($this->isFaultRequest($responseCode)) {
-                throw new Exception("Waring: Response code: {$responseCode}. Info: {$responseData['data']['name']}. Message: {$responseData['data']['message']}");
+                throw new Exception("Warning: Response code: {$responseCode}. {$curlResultRequest}");
             }
             
+            $responseData = json_decode($curlResultRequest,TRUE);
+
+            if(isNotEmpty($responseData['info']['statuscode'])) {
+                if($this->isFaultRequest($responseData['info']['statuscode'])) {
+                    throw new Exception(implode(" ", $responseData['info']['messages']));
+                }
+            }
+
             //$responseData['connection']['time'] = round(curl_getinfo($curl, CURLINFO_CONNECT_TIME),2);
 
             curl_close($curl);
@@ -100,8 +119,7 @@ class Provider implements ProviderInterface {
         catch (Exception $e) {
             return ['message' => $e->getMessage()];
         }
-        
-            return $responseData['data'];
+            return $responseData['route'];
     }
 
     public function getTransitData(): Array
