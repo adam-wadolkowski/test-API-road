@@ -2,21 +2,31 @@
 
 namespace App\Controllers\Transit;
 
-use App\Controllers\Transit\TransitsInterface;
+//use App\Controllers\Transit\TransitsInterface;
 use App\Controllers\Transit\Transit;
 
-class Transits {//implements TransitsInterface {
+class Transits implements TransitsInterface {
     
-    private $routeIndexes = [];
+    private $routeIndexes = ['distance','formattedTime','realTime','fuelUsed'];
     private $instance;
+    private $errorMassage;
 
-    //getRouteIndexes
-    public function __construct()
+    public function __construct(Array $transitData = [])
     {
+        if(empty($transitData['message'])) {
 
-        
-        //if(empty($this->$routeIndexes))
-        //var_dump((new Transit())->getRouteIndexes());
-        var_dump(array_keys(get_object_vars(new Transit())));
+            $saveTransitData = [];
+            foreach ($this->routeIndexes as $index) {
+                $saveTransitData[$index] = $transitData[$index];
+            }
+            $this->instance[] =  new Transit($saveTransitData);
+        }
+        else
+            $this->errorMassage = $transitData;
+    }
+    
+    public function getTransits(): Array
+    {
+        return empty($this->instance) ? $this->errorMassage : $this->instance;
     }
 }
