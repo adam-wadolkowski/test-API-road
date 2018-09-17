@@ -8,8 +8,7 @@ use Exception;
 class Provider implements ProviderInterface {
 
     private $httpSuccessCodes = [200,202];
-    private $apiKey = ['key' => 'EvsnNn2Q5CvsxEvDNe5FDA79V9NRayhU'];
-    //private $apiKey = ['key' => ''];
+    private $apiSettings = ['key' => 'EvsnNn2Q5CvsxEvDNe5FDA79V9NRayhU','routeType' => 'shortest', 'unit' => 'k'];
     private $connectionOptions = [
         CURLOPT_URL => 'http://www.mapquestapi.com/directions/v2/route?',
         CURLOPT_HEADER => false,
@@ -19,12 +18,12 @@ class Provider implements ProviderInterface {
     public function __construct(Array $additionalsURLOptions = [])
     {   
         
-        if($this->isSetApiKey()){
-            $URL = $this->updateURLConnection($this->apiKey);
+        if($this->isSetKeyApi()){
+            $URL = $this->updateURLConnection($this->apiSettings);
             $this->setConnectionOptions([CURLOPT_URL => $URL]);
         }
         else
-            echo 'TO DO - get api key from config file .env';
+            echo 'TO DO - get api settings from config file .env';
         
         if(isArrayNotEmpty($additionalsURLOptions)) {
 
@@ -34,9 +33,9 @@ class Provider implements ProviderInterface {
         }
     }
 
-    private function isSetApiKey(): bool
+    private function isSetKeyApi(): bool
     {
-        return empty($this->apiKey['key']) ? false : true; 
+        return empty($this->apiSettings['key']) ? false : true; 
     }
 
     private function updateURLConnection(Array $data): String 
