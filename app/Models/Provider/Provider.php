@@ -47,7 +47,7 @@ class Provider implements ProviderInterface {
         return $URL;
     }
 
-    private function getHttpSuccessCodes(): Array
+    public function getHttpSuccessCodes(): Array
     {
         return $this->httpSuccessCodes;
     }
