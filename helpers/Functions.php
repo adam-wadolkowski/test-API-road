@@ -5,7 +5,7 @@ function isArrayNotEmpty(Array $data): bool
     return $data === [] ? false : true;
 }
 
-function isNotEmpty(STring $data): bool
+function isNotEmpty($data): bool
 {
     return empty($data) ? false : true;
 }
