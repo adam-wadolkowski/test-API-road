@@ -9,10 +9,10 @@ require_once('vendor/autoload.php');
 use App\Models\Provider\Provider;
 use App\Controllers\Transit\Transits;
 
-
-$urlOptions = ['from' => 'Denver%2C+CO', 'to' => 'Boulder%2C+CO','outFormat' => 'json','routeType' =>'shortest', 'unit' => 'k' ];
+$urlOptions = ['from' => 'Denver%2C+CO', 'to' => 'Chicago'];
 
 $provider = new Provider($urlOptions);
 $providerData = $provider->getTransitData();
-//var_dump($providerData);
-$transits = new Transits();
+$transits = new Transits($providerData);
+$data = $transits->getTransits();
+var_dump($data);
